@@ -1,0 +1,48 @@
+.claude/
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+*.lcov
+
+# Production
+build/
+dist/
+out/
+
+# Hardhat
+cache/
+artifacts/
+typechain-types/
+
+# Next.js
+.next/
+.vercel
+
+# Environment variables
+.env
+.env*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+CLAUDE.md
