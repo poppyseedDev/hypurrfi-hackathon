@@ -120,10 +120,10 @@ NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id # From cloud.walletconnect.
 
 **Network Details:**
 - Network Name: HyperEVM
-- RPC URL: `https://api.hyperliquid.xyz/evm`
-- Chain ID: `999`
+- RPC URL: `https://rpc.hyperliquid-testnet.xyz/evm`
+- Chain ID: `998`
 - Currency Symbol: HYPE
-- Block Explorer: `https://explorer.hyperliquid.xyz`
+- Block Explorer: `https://testnet.purrsec.com/`
 
 ## 🚀 Deployment
 
