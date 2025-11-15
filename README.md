@@ -130,8 +130,6 @@ NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id # From cloud.walletconnect.
 ### Deploy Smart Contracts
 
 ```bash
-cd packages/hardhat
-
 # Compile contracts
 pnpm compile
 
@@ -152,10 +150,8 @@ After deployment, copy the vault address and update:
 ### Run Frontend
 
 ```bash
-cd packages/nextjs
-
 # Development mode
-pnpm dev
+pnpm run dev
 
 # Build for production
 pnpm build

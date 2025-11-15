@@ -4,11 +4,17 @@
   "private": true,
   "description": "Stable Yield Loop Vault for HypurrFi - Hackathon Project",
   "scripts": {
-    "hardhat": "pnpm --filter hardhat",
-    "nextjs": "pnpm --filter nextjs",
-    "dev": "pnpm --filter nextjs dev",
-    "build": "pnpm -r build",
-    "test": "pnpm --filter hardhat test"
+    "dev": "pnpm --filter ./packages/nextjs dev",
+    "build": "pnpm -r ./packages/nextjs build",
+    "start": "pnpm --filter ./packages/nextjs start",
+    "lint": "pnpm --filter ./packages/nextjs lint",
+    "test": "pnpm --filter ./packages/hardhat test",
+    "test:coverage": "pnpm --filter ./packages/hardhat test:coverage",
+    "compile": "pnpm --filter ./packages/hardhat compile",
+    "deploy:testnet": "pnpm --filter ./packages/hardhat deploy:testnet",
+    "deploy:mainnet": "pnpm --filter ./packages/hardhat deploy:mainnet",
+    "clean": "pnpm --filter ./packages/hardhat clean",
+    "clean:all": "pnpm -r ./packages/hardhat clean"
   },
   "keywords": ["hypurrfi", "defi", "yield", "vault", "hyperevm"],
   "author": "",
