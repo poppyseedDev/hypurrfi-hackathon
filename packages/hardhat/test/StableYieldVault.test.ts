@@ -9,35 +9,40 @@ describe("StableYieldVault", async function () {
   const publicClient = await viem.getPublicClient();
   const [owner, user1, user2] = await viem.getWalletClients();
 
-  // HypurrFi contracts (HyperEVM mainnet)
-  const HYPURRFI_POOL = "0xceCcE0EB9DD2Ef7996e01e25DD70e461F918A14b" as `0x${string}`;
-  const USDC = "0xb88339CB7199b77E23DB6E890353E22632Ba630f" as `0x${string}`;
-  const USDXL = "0xca79db4b49f608ef54a5cb813fbed3a6387bc645" as `0x${string}`;
-
   let vault: Awaited<ReturnType<typeof viem.deployContract>>;
+  let mockPool: Awaited<ReturnType<typeof viem.deployContract>>;
+  let mockUSDC: Awaited<ReturnType<typeof viem.deployContract>>;
+  let mockUSDXL: Awaited<ReturnType<typeof viem.deployContract>>;
 
   describe("Deployment", function () {
+    beforeEach(async function () {
+      // Deploy mock contracts
+      mockPool = await viem.deployContract("MockPool");
+      mockUSDC = await viem.deployContract("MockERC20", ["Mock USDC", "USDC"]);
+      mockUSDXL = await viem.deployContract("MockERC20", ["Mock USDXL", "USDXL"]);
+    });
+
     it("Should deploy vault with correct parameters", async function () {
       vault = await viem.deployContract("StableYieldVault", [
-        HYPURRFI_POOL,
-        USDC,
-        USDXL,
+        mockPool.address,
+        mockUSDC.address,
+        mockUSDXL.address,
         "Stable Yield Vault",
         "SYV"
       ]);
 
       assert.equal(await vault.read.name(), "Stable Yield Vault");
       assert.equal(await vault.read.symbol(), "SYV");
-      assert.equal(await vault.read.hypurrfiPool(), HYPURRFI_POOL);
-      assert.equal(await vault.read.depositAsset(), USDC);
-      assert.equal(await vault.read.borrowAsset(), USDXL);
+      assert.equal(String(await vault.read.hypurrfiPool()).toLowerCase(), String(mockPool.address).toLowerCase());
+      assert.equal(String(await vault.read.depositAsset()).toLowerCase(), String(mockUSDC.address).toLowerCase());
+      assert.equal(String(await vault.read.borrowAsset()).toLowerCase(), String(mockUSDXL.address).toLowerCase());
     });
 
     it("Should have correct initial parameters", async function () {
       vault = await viem.deployContract("StableYieldVault", [
-        HYPURRFI_POOL,
-        USDC,
-        USDXL,
+        mockPool.address,
+        mockUSDC.address,
+        mockUSDXL.address,
         "Stable Yield Vault",
         "SYV"
       ]);
@@ -53,8 +58,8 @@ describe("StableYieldVault", async function () {
         async () => {
           await viem.deployContract("StableYieldVault", [
             zeroAddress,
-            USDC,
-            USDXL,
+            mockUSDC.address,
+            mockUSDXL.address,
             "Test",
             "TEST"
           ]);
@@ -69,10 +74,15 @@ describe("StableYieldVault", async function () {
 
   describe("Deposits and Withdrawals", function () {
     beforeEach(async function () {
+      // Deploy mock contracts
+      mockPool = await viem.deployContract("MockPool");
+      mockUSDC = await viem.deployContract("MockERC20", ["Mock USDC", "USDC"]);
+      mockUSDXL = await viem.deployContract("MockERC20", ["Mock USDXL", "USDXL"]);
+      
       vault = await viem.deployContract("StableYieldVault", [
-        HYPURRFI_POOL,
-        USDC,
-        USDXL,
+        mockPool.address,
+        mockUSDC.address,
+        mockUSDXL.address,
         "Stable Yield Vault",
         "SYV"
       ]);
@@ -109,10 +119,15 @@ describe("StableYieldVault", async function () {
 
   describe("Risk Management", function () {
     beforeEach(async function () {
+      // Deploy mock contracts
+      mockPool = await viem.deployContract("MockPool");
+      mockUSDC = await viem.deployContract("MockERC20", ["Mock USDC", "USDC"]);
+      mockUSDXL = await viem.deployContract("MockERC20", ["Mock USDXL", "USDXL"]);
+      
       vault = await viem.deployContract("StableYieldVault", [
-        HYPURRFI_POOL,
-        USDC,
-        USDXL,
+        mockPool.address,
+        mockUSDC.address,
+        mockUSDXL.address,
         "Stable Yield Vault",
         "SYV"
       ]);
@@ -159,6 +174,12 @@ describe("StableYieldVault", async function () {
       await assert.rejects(
         async () => {
           await vault.write.delever({ account: user1.account });
+        },
+        (error: any) => {
+          return error.message?.includes("Ownable") || 
+                 error.shortMessage?.includes("Ownable") ||
+                 error.message?.includes("not the owner") ||
+                 error.shortMessage?.includes("not the owner");
         }
       );
 
@@ -170,6 +191,12 @@ describe("StableYieldVault", async function () {
       await assert.rejects(
         async () => {
           await vault.write.emergencyWithdrawAll({ account: user1.account });
+        },
+        (error: any) => {
+          return error.message?.includes("Ownable") || 
+                 error.shortMessage?.includes("Ownable") ||
+                 error.message?.includes("not the owner") ||
+                 error.shortMessage?.includes("not the owner");
         }
       );
     });
@@ -177,10 +204,15 @@ describe("StableYieldVault", async function () {
 
   describe("View Functions", function () {
     beforeEach(async function () {
+      // Deploy mock contracts
+      mockPool = await viem.deployContract("MockPool");
+      mockUSDC = await viem.deployContract("MockERC20", ["Mock USDC", "USDC"]);
+      mockUSDXL = await viem.deployContract("MockERC20", ["Mock USDXL", "USDXL"]);
+      
       vault = await viem.deployContract("StableYieldVault", [
-        HYPURRFI_POOL,
-        USDC,
-        USDXL,
+        mockPool.address,
+        mockUSDC.address,
+        mockUSDXL.address,
         "Stable Yield Vault",
         "SYV"
       ]);
@@ -193,6 +225,7 @@ describe("StableYieldVault", async function () {
       assert.equal(collateral, 0n);
       assert.equal(debt, 0n);
       // Health factor is max uint256 when no debt
+      assert.equal(healthFactor, BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"));
     });
 
     it("Should return total assets", async function () {
@@ -203,22 +236,28 @@ describe("StableYieldVault", async function () {
     it("Should return health factor", async function () {
       const healthFactor = await vault.read.getHealthFactor();
       // Should be max value when no debt
+      assert.equal(healthFactor, BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"));
     });
   });
 
   describe("Events", function () {
     beforeEach(async function () {
+      // Deploy mock contracts
+      mockPool = await viem.deployContract("MockPool");
+      mockUSDC = await viem.deployContract("MockERC20", ["Mock USDC", "USDC"]);
+      mockUSDXL = await viem.deployContract("MockERC20", ["Mock USDXL", "USDXL"]);
+      
       vault = await viem.deployContract("StableYieldVault", [
-        HYPURRFI_POOL,
-        USDC,
-        USDXL,
+        mockPool.address,
+        mockUSDC.address,
+        mockUSDXL.address,
         "Stable Yield Vault",
         "SYV"
       ]);
     });
 
     it("Should emit ParametersUpdated on parameter change", async function () {
-      await viem.assertions.emit(
+      await viem.assertions.emitWithArgs(
         vault.write.updateParameters(
           [
             parseEther("1.35"),
@@ -229,7 +268,13 @@ describe("StableYieldVault", async function () {
           { account: owner.account }
         ),
         vault,
-        "ParametersUpdated"
+        "ParametersUpdated",
+        [
+          parseEther("1.35"),
+          parseEther("1.2"),
+          parseEther("1.6"),
+          6500n
+        ]
       );
     });
   });
